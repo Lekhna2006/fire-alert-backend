@@ -22,7 +22,8 @@ public class AlertService {
 
     public AlertService(AlertRepository alertRepository,
                         UserRepository userRepository,
-                        CurrentStateRepository currentStateRepository, EmailService emailService) {
+                        CurrentStateRepository currentStateRepository,
+                        EmailService emailService) {
 
         this.alertRepository = alertRepository;
         this.userRepository = userRepository;
@@ -67,57 +68,56 @@ public class AlertService {
         currentState.setFire(request.getFire());
         currentState.setSmoke(request.getSmoke());
         currentState.setLastSeen(Instant.now());
+        currentState.setDeviceStatus("ONLINE");
 
         currentStateRepository.save(currentState);
+
+        Alert lastSavedAlert = null;
 
         // FIRE became dangerous now
         if (currentFireDanger && !previousFireDanger) {
 
-            Alert alert = new Alert();
+            Alert fireAlert = new Alert();
 
-            alert.setEmail(user.getEmail());
-            alert.setDeviceId(request.getDeviceId());
-            alert.setAlertType("FIRE");
-            alert.setStatus("DETECTED");
-            alert.setDeviceStatus("ONLINE");
-            alert.setTimestamp(Instant.now());
+            fireAlert.setEmail(user.getEmail());
+            fireAlert.setDeviceId(request.getDeviceId());
+            fireAlert.setAlertType("FIRE");
+            fireAlert.setStatus("DETECTED");
+            fireAlert.setDeviceStatus("ONLINE");
+            fireAlert.setTimestamp(Instant.now());
 
-            Alert savedAlert = alertRepository.save(alert);
+            lastSavedAlert = alertRepository.save(fireAlert);
 
             emailService.sendAlertEmail(
                     user.getEmail(),
                     "FIRE",
                     request.getDeviceId()
             );
-
-            return savedAlert;
         }
 
         // SMOKE became dangerous now
         if (currentSmokeDanger && !previousSmokeDanger) {
 
-            Alert alert = new Alert();
+            Alert smokeAlert = new Alert();
 
-            alert.setEmail(user.getEmail());
-            alert.setDeviceId(request.getDeviceId());
-            alert.setAlertType("SMOKE");
-            alert.setStatus("DETECTED");
-            alert.setDeviceStatus("ONLINE");
-            alert.setTimestamp(Instant.now());
+            smokeAlert.setEmail(user.getEmail());
+            smokeAlert.setDeviceId(request.getDeviceId());
+            smokeAlert.setAlertType("SMOKE");
+            smokeAlert.setStatus("DETECTED");
+            smokeAlert.setDeviceStatus("ONLINE");
+            smokeAlert.setTimestamp(Instant.now());
 
-            Alert savedAlert = alertRepository.save(alert);
+            lastSavedAlert = alertRepository.save(smokeAlert);
 
             emailService.sendAlertEmail(
                     user.getEmail(),
                     "SMOKE",
                     request.getDeviceId()
             );
-
-            return savedAlert;
         }
 
         // SAFE signal or already-existing danger
-        return null;
+        return lastSavedAlert;
     }
 
     public List<Alert> getAlertsByDeviceId(String deviceId) {
