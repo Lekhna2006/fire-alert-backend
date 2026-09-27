@@ -21,10 +21,6 @@ public class UserService {
 
     public User register(RegisterRequest request) {
 
-        if (userRepository.existsByDeviceId(request.getDeviceId())) {
-            throw new RuntimeException("This device is already registered");
-        }
-
         User user = new User();
 
         user.setName(request.getName());
@@ -61,9 +57,10 @@ public class UserService {
         return user;
     }
 
-    public User getProfile(String deviceId) {
+    public User getProfile(String email, String deviceId) {
+
         return userRepository
-                .findByDeviceId(deviceId)
+                .findByEmailAndDeviceId(email, deviceId)
                 .orElseThrow(() ->
                         new RuntimeException("User not found"));
     }

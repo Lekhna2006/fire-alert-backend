@@ -33,11 +33,13 @@ public class AlertService {
 
     public Alert createAlert(AlertRequest request) {
 
-        // Find the user registered with this device
-        User user = userRepository
-                .findByDeviceId(request.getDeviceId())
-                .orElseThrow(() ->
-                        new RuntimeException("Device not registered"));
+        // Find ALL users registered with this device
+        List<User> users = userRepository
+                .findAllByDeviceId(request.getDeviceId());
+
+        if (users.isEmpty()) {
+            throw new RuntimeException("Device not registered");
+        }
 
         // Check the previous current state
         CurrentState currentState = currentStateRepository
@@ -79,7 +81,7 @@ public class AlertService {
 
             Alert fireAlert = new Alert();
 
-            fireAlert.setEmail(user.getEmail());
+            fireAlert.setEmail(users.get(0).getEmail());
             fireAlert.setDeviceId(request.getDeviceId());
             fireAlert.setAlertType("FIRE");
             fireAlert.setStatus("DETECTED");
@@ -88,11 +90,15 @@ public class AlertService {
 
             lastSavedAlert = alertRepository.save(fireAlert);
 
-            emailService.sendAlertEmail(
-                    user.getEmail(),
-                    "FIRE",
-                    request.getDeviceId()
-            );
+            // Send FIRE email to ALL users
+            for (User user : users) {
+
+                emailService.sendAlertEmail(
+                        user.getEmail(),
+                        "FIRE",
+                        request.getDeviceId()
+                );
+            }
         }
 
         // SMOKE became dangerous now
@@ -100,7 +106,7 @@ public class AlertService {
 
             Alert smokeAlert = new Alert();
 
-            smokeAlert.setEmail(user.getEmail());
+            smokeAlert.setEmail(users.get(0).getEmail());
             smokeAlert.setDeviceId(request.getDeviceId());
             smokeAlert.setAlertType("SMOKE");
             smokeAlert.setStatus("DETECTED");
@@ -109,11 +115,15 @@ public class AlertService {
 
             lastSavedAlert = alertRepository.save(smokeAlert);
 
-            emailService.sendAlertEmail(
-                    user.getEmail(),
-                    "SMOKE",
-                    request.getDeviceId()
-            );
+            // Send SMOKE email to ALL users
+            for (User user : users) {
+
+                emailService.sendAlertEmail(
+                        user.getEmail(),
+                        "SMOKE",
+                        request.getDeviceId()
+                );
+            }
         }
 
         // SAFE signal or already-existing danger

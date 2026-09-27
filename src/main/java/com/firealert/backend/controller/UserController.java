@@ -27,8 +27,11 @@ public class UserController {
         return userService.login(request);
     }
 
-    @GetMapping("/profile/{deviceId}")
-    public User getProfile(@PathVariable String deviceId) {
-        return userService.getProfile(deviceId);
+    @GetMapping("/profile/{deviceId}/{email}")
+    public User getProfile(
+            @PathVariable String deviceId,
+            @PathVariable String email) {
+
+        return userService.getProfile(email, deviceId);
     }
 }
