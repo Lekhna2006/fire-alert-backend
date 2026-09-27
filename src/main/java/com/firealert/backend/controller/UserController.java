@@ -6,7 +6,10 @@ import com.firealert.backend.model.User;
 import com.firealert.backend.service.UserService;
 import org.springframework.web.bind.annotation.*;
 
-@CrossOrigin(origins="http://localhost:5173")
+@CrossOrigin(origins = {
+        "http://localhost:5173",
+        "https://fire-alert-frontend.vercel.app"
+})
 @RestController
 @RequestMapping("/api/users")
 public class UserController {

@@ -40,7 +40,7 @@ public class EmailService {
                         "Date & Time: " + dateTime + "\n\n" +
                         "Please check your Fire Alert website for more details.\n\n" +
                         "🌐 Website:\n" +
-                        "Website link will be added after deployment."
+                        "https://fire-alert-frontend.vercel.app/"
         );
 
         mailSender.send(message);

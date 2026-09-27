@@ -4,7 +4,10 @@ import com.firealert.backend.model.CurrentState;
 import com.firealert.backend.repository.CurrentStateRepository;
 import org.springframework.web.bind.annotation.*;
 
-@CrossOrigin(origins="http://localhost:5173")
+@CrossOrigin(origins = {
+        "http://localhost:5173",
+        "https://fire-alert-frontend.vercel.app"
+})
 @RestController
 @RequestMapping("/api/current-state")
 public class CurrentStateController {
